@@ -1,4 +1,4 @@
-import tkinter as tk
+'''import tkinter as tk
 import random
 
 a=tk.Tk()
@@ -26,4 +26,40 @@ for r in range(9):
         label.grid(row=r, column=c, padx=0.5, pady=0.5)
         button.grid(row=r, column=c, padx=0.5, pady=0.5)
 
+a.mainloop()
+'''
+
+import tkinter as tk
+import random
+
+a = tk.Tk()
+a.title("Minesweeper")
+a.geometry("612x657")
+
+rows, cols = 9, 9
+total_cells = rows * cols
+total_mines= 10
+
+mines = []
+while len(mines) < total_mines:
+    n = random.randint(1, total_cells)
+    if n not in mines:
+        mines.append(n)
+
+print(mines)
+
+current_grid_number = 1  
+
+for r in range(rows):
+    for c in range(cols):
+        if current_grid_number in mines:
+            text = '💣'
+            bgc='grey'
+        else:
+            text=''
+            bgc='white'
+
+        btn = tk.Button(a, text=text,width=8,height=4,relief="raised",bg=bgc)
+        btn.grid(row= r, column=c)
+        current_grid_number+=1
 a.mainloop()
