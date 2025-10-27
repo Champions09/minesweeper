@@ -6,16 +6,22 @@ a=tk.Tk()
 def main_screen():
     a.geometry("600x600")
     a.title("Minesweeper")
+    
     name_of_game=tk.Label(a,text="MINESWEEPER",font=("Arial",24))
     name_of_game.place(x=180,y=10)
+    
     choose_mode=tk.Label(a,text="Choose Mode:-",font=("Arial",16))
     choose_mode.place(x=225,y=150)
+    
     easy_mode=tk.Button(a,text="EASY",font=("Arial",14),width=10,height=2,relief="raised",command=easy_mode_file)
     easy_mode.place(x=65,y=225)
+    
     medium_mode=tk.Button(a,text="MEDIUM",font=("Arial",14),width=10,height=2,relief="raised",command=medium_mode_file)
     medium_mode.place(x=230,y=225)
+    
     hard_mode=tk.Button(a,text="HARD",font=("Arial",14),width=10,height=2,relief="raised",command=hard_mode_file)
     hard_mode.place(x=395,y=225)
+    
     instructions=tk.Label(a,text='''                            Instructions:-
                       
                            1.Left click to reveal peice.
@@ -24,6 +30,7 @@ def main_screen():
               
                   3.Look out for mines.''',font=("Arial",16))
     instructions.place(x=10,y=350)
+    
     a.mainloop()
 
 def create_grid(rows,cols,total_mines):
@@ -67,32 +74,18 @@ def create_grid(rows,cols,total_mines):
         
     return grid
 
-def create_UI(rows,cols, mines,size,mode,element_width,element_height):
+def create_UI(rows,cols, mines,window_size,mode,element_width,element_height):
     a.destroy()
     b=tk.Tk()
     b.title(mode+" Mode")
-    b.geometry(size)
+    b.geometry(window_size)
 
     grid = create_grid(rows,cols, mines)
 
     buttons={}
     for r in range(rows):
         for c in range(cols):
-            val = grid[r][c]
-            if val == -1:
-                text = "💣"
-                bgc='red'
-            elif val == 0:
-                text = "0"
-                bgc='white'
-            else:
-                text = str(val)
-                bgc='white'
-
-            label = tk.Label(b, text=text, width=8, height=4, bg=bgc,relief='solid')
-            label.grid(row=r, column=c, padx=0, pady=0)
-
-            button = tk.Button(b, text="", width=8, height=4, relief="raised", bg="grey")
+            button = tk.Button(b, text="", width=element_width, height=element_height, relief="raised", bg="grey")
             button.grid(row=r, column=c)
             
             buttons[(r,c)] = button
@@ -101,17 +94,15 @@ def create_UI(rows,cols, mines,size,mode,element_width,element_height):
         val = grid[r][c]
         button = buttons[(r, c)]
         
-        def on_click(b=button, v=val, rr=r, cc=c):
+        def on_click(b=button, v=val):
             if v == -1:
                 b.config(text="💣", bg='red')
             elif v == 0:
-                b.config(text="", bg='white', state='disabled')
+                b.config(text="", bg='white')
             else:
-                b.config(text=str(v), bg='white', disabledforeground='blue', state='disabled')
+                b.config(text=str(v), bg='white', disabledforeground='red')
         
         button.config(command=on_click)
-
-    b.mainloop()
 
 def easy_mode_file():
     create_UI(9,9,10,"594x639", 'EASY',8,4)
