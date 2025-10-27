@@ -26,16 +26,9 @@ def main_screen():
     instructions.place(x=10,y=350)
     a.mainloop()
 
-def easy_mode_file():
-    a.destroy()
-    b=tk.Tk()
-    b.title("Easy Mode")
-    b.geometry("594x639")
-
-    rows, cols = 9, 9
+def create_grid(rows,cols,total_mines):
     total_cells = rows * cols
-    total_mines= 10
-
+   
     mines = []
     while len(mines) < total_mines:
         n = random.randint(1, total_cells)
@@ -62,17 +55,27 @@ def easy_mode_file():
     for num in mines:
         r,c = convert_num_to_grid(num)
         grid[r][c] = -1 #mine is present at this position
-    
+
         #adding plus one to the neighbouring boxes
         l=[r-1,r,r+1]
         m=[c-1,c,c+1]
-    
+
         for i in l:
             for j in m:
                 if 0 <= i < rows and 0 <= j < cols and grid[i][j] != -1:
                     grid[i][j] += 1
+        
+    return grid
 
-    l=[]
+def create_UI(rows,cols, mines,size,mode,element_width,element_height):
+    a.destroy()
+    b=tk.Tk()
+    b.title(mode+" Mode")
+    b.geometry(size)
+
+    grid = create_grid(rows,cols, mines)
+
+    buttons={}
     for r in range(rows):
         for c in range(cols):
             val = grid[r][c]
@@ -80,7 +83,7 @@ def easy_mode_file():
                 text = "💣"
                 bgc='red'
             elif val == 0:
-                text = ""
+                text = "0"
                 bgc='white'
             else:
                 text = str(val)
@@ -89,181 +92,34 @@ def easy_mode_file():
             label = tk.Label(b, text=text, width=8, height=4, bg=bgc,relief='solid')
             label.grid(row=r, column=c, padx=0, pady=0)
 
-            if c%2==0 and r%2!=0 or c%2!=0 and r%2==0:
-                colour="grey"
-            else:
-                colour="white"
-            button = tk.Button(b, text="", width=8, height=4, relief="raised", bg=colour)
+            button = tk.Button(b, text="", width=8, height=4, relief="raised", bg="grey")
             button.grid(row=r, column=c)
+            
+            buttons[(r,c)] = button
+
+    for r, c in buttons.keys():
+        val = grid[r][c]
+        button = buttons[(r, c)]
         
-            l.append(button)
+        def on_click(b=button, v=val, rr=r, cc=c):
+            if v == -1:
+                b.config(text="💣", bg='red')
+            elif v == 0:
+                b.config(text="", bg='white', state='disabled')
+            else:
+                b.config(text=str(v), bg='white', disabledforeground='blue', state='disabled')
         
-    for i in l:
-        def on_click(b=i):
-            b.destroy()
-        if text=="💣":
-            game_over_screen=tk.Tk()
-            game_over_screen.title("GAME OVER")
-            game_over_screen.geometry("100x100")
-            game_over_label=tk.Label(game_over_screen, text="GAME OVER", width=16, height=8)
-            game_over_button=tk.Button(game_over_screen, text="MAIN MENU", width=10, height=2,font=("Arial",14))
-            game_over_label.place(x=10,y=20)
-            game_over_button.place(x=20,y=30)
-            game_over_screen.mainloop()
-        i.config(command=on_click)
+        button.config(command=on_click)
+
+    b.mainloop()
+
+def easy_mode_file():
+    create_UI(9,9,10,"594x639", 'EASY',8,4)
 
 def medium_mode_file():
-    a.destroy()
-    b=tk.Tk()
-    b.title("Medium Mode")
-    b.geometry("676x728")
-
-    rows, cols = 13, 13
-    total_cells = rows * cols
-    total_mines= 21
-
-    mines = []
-    while len(mines) < total_mines:
-        n = random.randint(1, total_cells)
-        if n not in mines:
-            mines.append(n)
-    mines.sort()
-
-    def convert_num_to_grid(num):
-        row = (num - 1) // cols
-        col = (num - 1) % cols
-        return row, col
-
-    grid =[]
-    for r in range(rows):
-        grid.append([])
-        for c in range(cols):
-            grid[r].append(0)
-
-    '''
-    (r-1,c-1)  (r-1,c)  (r-1,c+1)
-    (r,  c-1)  (r,  c)  (r,  c+1)
-    (r+1,c-1)  (r+1,c)  (r+1,c+1)
-    '''
-    for num in mines:
-        r,c = convert_num_to_grid(num)
-        grid[r][c] = -1 #mine is present at this position
-    
-        #adding plus one to the neighbouring boxes
-        l=[r-1,r,r+1]
-        m=[c-1,c,c+1]
-    
-        for i in l:
-            for j in m:
-                if 0 <= i < rows and 0 <= j < cols and grid[i][j] != -1:
-                    grid[i][j] += 1
-
-    l=[]
-    for r in range(rows):
-        for c in range(cols):
-            val = grid[r][c]
-            if val == -1:
-                text = "💣"
-                bgc='red'
-            elif val == 0:
-                text = ""
-                bgc='white'
-            else:
-                text = str(val)
-                bgc='white'
-
-            label = tk.Label(b, text=text, width=6, height=3, bg=bgc,relief='solid')
-            label.grid(row=r, column=c, padx=0, pady=0)
-
-            if c%2==0 and r%2!=0 or c%2!=0 and r%2==0:
-                colour="grey"
-            else:
-                colour="white"
-            button = tk.Button(b, text="", width=6, height=3, relief="raised", bg=colour)
-            button.grid(row=r, column=c)
-        
-            l.append(button)
-        
-    for i in l:
-        def on_click(b=i):
-            b.destroy()
-        i.config(command=on_click)
+    create_UI(13,13,21,"676x728", 'MEDIUM',6,3)
 
 def hard_mode_file():
-    a.destroy()
-    b=tk.Tk()
-    b.title("Hard Mode")
-    b.geometry("646x698")
-
-    rows, cols = 17, 17
-    total_cells = rows * cols
-    total_mines= 35
-
-    mines = []
-    while len(mines) < total_mines:
-        n = random.randint(1, total_cells)
-        if n not in mines:
-            mines.append(n)
-    mines.sort()
-
-    def convert_num_to_grid(num):
-        row = (num - 1) // cols
-        col = (num - 1) % cols
-        return row, col
-
-    grid =[]
-    for r in range(rows):
-        grid.append([])
-        for c in range(cols):
-            grid[r].append(0)
-
-    '''
-    (r-1,c-1)  (r-1,c)  (r-1,c+1)
-    (r,  c-1)  (r,  c)  (r,  c+1)
-    (r+1,c-1)  (r+1,c)  (r+1,c+1)
-    '''
-    for num in mines:
-        r,c = convert_num_to_grid(num)
-        grid[r][c] = -1 #mine is present at this position
-    
-        #adding plus one to the neighbouring boxes
-        l=[r-1,r,r+1]
-        m=[c-1,c,c+1]
-    
-        for i in l:
-            for j in m:
-                if 0 <= i < rows and 0 <= j < cols and grid[i][j] != -1:
-                    grid[i][j] += 1
-
-    l=[]
-    for r in range(rows):
-        for c in range(cols):
-            val = grid[r][c]
-            if val == -1:
-                text = "💣"
-                bgc='red'
-            elif val == 0:
-                text = ""
-                bgc='white'
-            else:
-                text = str(val)
-                bgc='white'
-
-            label = tk.Label(b, text=text, width=4, height=2, bg=bgc,relief='solid')
-            label.grid(row=r, column=c, padx=0, pady=0)
-
-            if c%2==0 and r%2!=0 or c%2!=0 and r%2==0:
-                colour="grey"
-            else:
-                colour="white"
-            button = tk.Button(b, text="", width=4, height=2, relief="raised", bg=colour)
-            button.grid(row=r, column=c)
-        
-            l.append(button)
-        
-    for i in l:
-        def on_click(b=i):
-            b.destroy()
-        i.config(command=on_click)
+    create_UI(17,17,35,"646x698", 'HARD',4,2)
 
 main_screen()
