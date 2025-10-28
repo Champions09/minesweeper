@@ -81,28 +81,47 @@ def create_UI(rows,cols, mines,window_size,mode,element_width,element_height):
     b.geometry(window_size)
 
     grid = create_grid(rows,cols, mines)
-
     buttons={}
+    
+    def on_click(r, c):
+        btn = buttons[(r, c)]
+        if btn["state"] == "disabled":
+            return  # already revealed
+
+        val = grid[r][c]
+
+        if val == -1:
+            btn.config(text="💣", bg="red", state="disabled")
+            return
+        elif val > 0:
+            btn.config(text=str(val), bg="white", relief="sunken", state="disabled", disabledforeground="red")
+        else:
+            btn.config(text="", bg="white", relief="sunken", state="disabled")
+
+            l=[r-1,r,r+1]
+            m=[c-1,c,c+1]
+            
+            for i in l:
+                for j in m:
+                    if 0 <= i < rows and 0 <= j < cols and not (i == r and j == c):
+                        neighbor_btn = buttons[(i, j)]
+                        if neighbor_btn["state"] != "disabled":
+                            neighbor_btn.invoke()
+        
+    # create buttons
     for r in range(rows):
         for c in range(cols):
-            button = tk.Button(b, text="", width=element_width, height=element_height, relief="raised", bg="grey")
+            button = tk.Button(
+                b,
+                text="",
+                width=element_width,
+                height=element_height,
+                relief="raised",
+                bg="grey",
+                command=lambda r=r, c=c: on_click(r, c)
+            )
             button.grid(row=r, column=c)
-            
-            buttons[(r,c)] = button
-
-    for r, c in buttons.keys():
-        val = grid[r][c]
-        button = buttons[(r, c)]
-        
-        def on_click(b=button, v=val):
-            if v == -1:
-                b.config(text="💣", bg='red')
-            elif v == 0:
-                b.config(text="", bg='white')
-            else:
-                b.config(text=str(v), bg='white', disabledforeground='red')
-        
-        button.config(command=on_click)
+            buttons[(r, c)] = button
 
 def easy_mode_file():
     create_UI(9,9,10,"594x639", 'EASY',8,4)
