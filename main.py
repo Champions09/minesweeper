@@ -85,30 +85,54 @@ def create_UI(rows, cols, mines, window_size, mode, element_width, element_heigh
     grid = create_grid(rows, cols, mines)
     buttons = {}
 
-    # Create flagged grid using loop style (like grid)
     flagged = []
+    no_of_flags = 0
     for r in range(rows):
         flagged.append([])
         for c in range(cols):
             flagged[r].append(0)  # 0 = not flagged, 1 = flagged
 
     def on_right_click(event, r, c):
+        nonlocal no_of_flags
         btn = buttons[(r, c)]
         if btn["state"] == "disabled":
-            return  # can't flag revealed cells
+            return 
 
         if flagged[r][c] == 1:
             # unflag
             btn.config(text="", bg="grey")
+            no_of_flags -= 1
             flagged[r][c] = 0
         else:
             # flag
             btn.config(text="🚩", bg="lightblue")
             flagged[r][c] = 1
+            no_of_flags += 1
+
+            
+        #To end the game if all mines are flagged correctly
+        if no_of_flags == mines:
+            all_flags_correct = True
+            for rr in range(rows):
+                for cc in range(cols):
+                    if flagged[rr][cc] == 1 and grid[rr][cc] != -1:
+                        all_flags_correct = False
+                        break
+                if all_flags_correct==False:
+                    break
+                
+            if all_flags_correct==True:
+                response = messagebox.askyesno(
+                    "Congratulations!", " You Won!\n Return to Main Menu?", icon='info')
+                if response:
+                    b.destroy()
+                    main_screen()
+                else:
+                    b.destroy()
 
     def on_click(r, c):
         if flagged[r][c] == 1:
-            return  # ignore click if flagged
+            return  
 
         btn = buttons[(r, c)]
         if btn["state"] == "disabled":
@@ -139,6 +163,7 @@ def create_UI(rows, cols, mines, window_size, mode, element_width, element_heigh
                         neighbor_btn = buttons[(i, j)]
                         if neighbor_btn["state"] != "disabled":
                             neighbor_btn.invoke()
+                    
 
     for r in range(rows):
         for c in range(cols):
@@ -180,7 +205,8 @@ def login_screen_ui():
 
     btn = tk.Button(login_screen, text="Login", width=10, command=lambda: chk(e1.get(), e2.get()))
     btn.place(x=350, y=300)
-
+    btn1=tk.Button(login_screen,text="Sign up",width=10, command=sign_up_screen)
+    btn1.place(x=150,y=300)
     login_screen.mainloop()
 
 # ---------- LOGIN CHECK ----------
@@ -192,4 +218,23 @@ def chk(x, y):
         main_screen()
     else:
         messagebox.showerror("Error", "Invalid username or password")
+
+def sign_up_screen():
+    global sign_up_screen
+    sign_up_screen = tk.Tk()
+    sign_up_screen.title("Minesweeper")
+    sign_up_screen.geometry("600x600")
+
+    tk.Label(sign_up_screen, text="Welcome to Minesweeper", font=("Arial", 36)).place(x=15, y=50)
+    tk.Label(sign_up_screen, text="Username:", font=("Arial", 18)).place(x=150, y=200)
+    e1 = tk.Entry(sign_up_screen)
+    e1.place(x=280, y=210)
+    tk.Label(sign_up_screen, text="Password:", font=("Arial", 18)).place(x=150, y=250)
+    e2 = tk.Entry(sign_up_screen, show="*")
+    e2.place(x=280, y=260)
+
+    btn = tk.Button(sign_up_screen, text="Sign up", width=10, command=login_screen_ui)
+    btn.place(x=350, y=300)
+
+    sign_up_screen.mainloop()
 login_screen_ui()
