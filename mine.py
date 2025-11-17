@@ -1,17 +1,17 @@
-# ---------- IMPORT MODULES ----------
 import tkinter as tk
 from tkinter import messagebox
 import random
-import csv
 import os
+import csv
 
 # ---------- CREATE CREDENTIALS FILE IF NOT EXISTS ----------
 if not os.path.exists("login_credentials.csv"):
     f= open("login_credentials.csv",'w',newline='')
     f.close()
 
+
 # ---------- LOGIN SCREEN UI ----------
-def login_screen_ui():
+def login_screen_UI():
     global login_screen
     login_screen = tk.Tk()
     login_screen.title("Minesweeper")
@@ -27,7 +27,7 @@ def login_screen_ui():
 
     btn = tk.Button(login_screen, text="Login", width=10, command=lambda: chk(e1.get(), e2.get()))
     btn.place(x=350, y=300)
-    btn1=tk.Button(login_screen,text="Sign up",width=10, command=sign_up_screen)
+    btn1=tk.Button(login_screen,text="Sign up",width=10, command=lambda:[login_screen.destroy(),sign_up_screen()])
     btn1.place(x=150,y=300)
     login_screen.mainloop()
 
@@ -39,14 +39,15 @@ def chk(x, y):
     for i in d:
         di[i[0]]=i[-1]
     if x in di:
-        if di[x]==y:main_screen()
+        if di[x]==y:
+            login_screen.destroy()
+            main_screen()
         else:messagebox.showerror("Error","Please enter correct password")
     else:messagebox.showerror("Error","no such username,Kindly Sign up")
     f.close()
 
 # ---------- SIGN UP SCREEN UI ----------
 def sign_up_screen():
-    login_screen.destroy()
     global sign_up_screen
     sign_up_screen = tk.Tk()
     sign_up_screen.title("Minesweeper")
@@ -61,7 +62,7 @@ def sign_up_screen():
     e2 = tk.Entry(sign_up_screen, textvariable= password ,show="*")
     e2.place(x=280, y=260)
 
-    btn = tk.Button(sign_up_screen, text="Sign up", width=10, command=login_screen_ui)
+    btn = tk.Button(sign_up_screen, text="Sign up", width=10, command=login_screen_UI)
     btn.place(x=350, y=300)
     def save_credentials():
         Name=username.get()
@@ -81,41 +82,40 @@ def sign_up_screen():
                 d=(Name,Password)
                 obj.writerow(d)
                 f.close()
-                messagebox.showinfo("Succesful","Go back to login screen and login")
+                messagebox.showinfo("Succesful","Succesfully signed up! Go back to login again")
                 sign_up_screen.destroy()
-                login_screen_ui()
+                login_screen_UI()
         f.close()
     btn = tk.Button(sign_up_screen, text="Sign up", width=10, command=save_credentials)
     btn.place(x=350, y=300)
-    btn1=tk.Button(sign_up_screen,text="Go back to login screen",width=20,command=lambda:[sign_up_screen.destroy(),login_screen_ui()])
+    btn1=tk.Button(sign_up_screen,text="Go back to login screen",width=20,command=lambda:[sign_up_screen.destroy(),login_screen_UI()])
     btn1.place(x=100,y=300)
 
     sign_up_screen.mainloop()
 
-# ---------- MAIN SCREEN UI ----------
+# ---------- GAME WINDOW ----------
 def main_screen():
-    login_screen.destroy()
-    global a
-    a=tk.Tk()
-    a.geometry("600x600")
-    a.title("Minesweeper")
+    global menu_screen
+    menu_screen=tk.Tk()
+    menu_screen.geometry("600x600")
+    menu_screen.title("Minesweeper")
     
-    name_of_game=tk.Label(a,text="MINESWEEPER",font=("Arial",24))
+    name_of_game=tk.Label(menu_screen,text="MINESWEEPER",font=("Arial",24))
     name_of_game.place(x=180,y=10)
     
-    choose_mode=tk.Label(a,text="Choose Mode:-",font=("Arial",16))
+    choose_mode=tk.Label(menu_screen,text="Choose Mode:-",font=("Arial",16))
     choose_mode.place(x=225,y=150)
     
-    easy_mode=tk.Button(a,text="EASY",font=("Arial",14),width=10,height=2,relief="raised",command=easy_mode_file)
+    easy_mode=tk.Button(menu_screen,text="EASY",font=("Arial",14),width=10,height=2,relief="raised",command=easy_mode_file)
     easy_mode.place(x=65,y=225)
     
-    medium_mode=tk.Button(a,text="MEDIUM",font=("Arial",14),width=10,height=2,relief="raised",command=medium_mode_file)
+    medium_mode=tk.Button(menu_screen,text="MEDIUM",font=("Arial",14),width=10,height=2,relief="raised",command=medium_mode_file)
     medium_mode.place(x=230,y=225)
     
-    hard_mode=tk.Button(a,text="HARD",font=("Arial",14),width=10,height=2,relief="raised",command=hard_mode_file)
+    hard_mode=tk.Button(menu_screen,text="HARD",font=("Arial",14),width=10,height=2,relief="raised",command=hard_mode_file)
     hard_mode.place(x=395,y=225)
     
-    instructions=tk.Label(a,text='''                            Instructions:-
+    instructions=tk.Label(menu_screen,text='''                            Instructions:-
                       
                            1.Left click to reveal peice.
                       
@@ -124,9 +124,9 @@ def main_screen():
                   3.Look out for mines.''',font=("Arial",16))
     instructions.place(x=10,y=350)
     
-    a.mainloop()
+    menu_screen.mainloop()
 
-# ---------- MINESWEEPER GAME UI ----------
+# ---------- GRID CREATION ----------
 def create_grid(rows,cols,total_mines):
     total_cells = rows * cols
    
@@ -168,13 +168,15 @@ def create_grid(rows,cols,total_mines):
         
     return grid
 
+
 def create_UI(rows, cols, mines, window_size, mode, element_width, element_height):
-    a.destroy()
-    b = tk.Tk()
-    b.title(mode + " Mode")
-    b.geometry(window_size)
+    menu_screen.destroy()
+    game_screen = tk.Tk()
+    game_screen.title(mode + " Mode")
+    game_screen.geometry(window_size)
 
     grid = create_grid(rows, cols, mines)
+    global buttons
     buttons = {}
 
     flagged = []
@@ -217,10 +219,10 @@ def create_UI(rows, cols, mines, window_size, mode, element_width, element_heigh
                 response = messagebox.askyesno(
                     "Congratulations!", " You Won!\n Return to Main Menu?", icon='info')
                 if response:
-                    b.destroy()
+                    game_screen.destroy()
                     main_screen()
                 else:
-                    b.destroy()
+                    game_screen.destroy()
 
     def on_click(r, c):
         if flagged[r][c] == 1:
@@ -237,30 +239,27 @@ def create_UI(rows, cols, mines, window_size, mode, element_width, element_heigh
             response = messagebox.askyesno(
                     "Game Over", " You Lost\n Return to Main Menu?", icon='warning')
             if response:
-                b.destroy()
+                game_screen.destroy()
                 main_screen()
             else:
-                b.destroy()
+                game_screen.destroy()
         elif val > 0:
             btn.config(text=str(val), bg="white", relief="sunken", state="disabled", disabledforeground="red")
         else:
             btn.config(text="", bg="white", relief="sunken", state="disabled")
-
-            l = [r-1, r, r+1]
-            m = [c-1, c, c+1]
-            
-            for i in l:
-                for j in m:
+            for i in [r-1, r, r+1]:
+                for j in [c-1, c, c+1]:
                     if 0 <= i < rows and 0 <= j < cols and not (i == r and j == c):
                         neighbor_btn = buttons[(i, j)]
                         if neighbor_btn["state"] != "disabled":
                             neighbor_btn.invoke()
                     
-
+    # ---------- BUTTON CREATION ----------
     for r in range(rows):
         for c in range(cols):
+
             button = tk.Button(
-                b,
+                game_screen,
                 text="",
                 width=element_width,
                 height=element_height,
@@ -281,4 +280,7 @@ def medium_mode_file():
 def hard_mode_file():
     create_UI(17,17,35,"646x698", 'HARD',4,2)
 
-login_screen_ui()
+login_screen_UI()
+ 
+
+    
