@@ -106,13 +106,13 @@ def main_screen():
     choose_mode=tk.Label(menu_screen,text="Choose Mode:-",font=("Arial",16))
     choose_mode.place(x=225,y=150)
     
-    easy_mode=tk.Button(menu_screen,text="EASY",font=("Arial",14),width=10,height=2,relief="raised",command=easy_mode_file)
+    easy_mode=tk.Button(menu_screen,text="EASY\n(10 mines)",font=("Arial",14),width=10,height=2,relief="raised",command=easy_mode_file)
     easy_mode.place(x=65,y=225)
     
-    medium_mode=tk.Button(menu_screen,text="MEDIUM",font=("Arial",14),width=10,height=2,relief="raised",command=medium_mode_file)
+    medium_mode=tk.Button(menu_screen,text="MEDIUM\n(21 mines)",font=("Arial",14),width=10,height=2,relief="raised",command=medium_mode_file)
     medium_mode.place(x=230,y=225)
     
-    hard_mode=tk.Button(menu_screen,text="HARD",font=("Arial",14),width=10,height=2,relief="raised",command=hard_mode_file)
+    hard_mode=tk.Button(menu_screen,text="HARD\n(35 mines)",font=("Arial",14),width=10,height=2,relief="raised",command=hard_mode_file)
     hard_mode.place(x=395,y=225)
     
     instructions=tk.Label(menu_screen,text='''                            Instructions:-
@@ -282,5 +282,6 @@ def hard_mode_file():
 
 login_screen_UI()
  
+
 
     
